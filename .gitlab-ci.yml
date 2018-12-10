@@ -1,0 +1,41 @@
+image: docker:dind
+
+stages:
+  - build
+
+.base: &base
+  stage: build
+  variables:
+    PHP_VERSION: ""
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build --tag $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine ./$PHP_VERSION-alpine
+    - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
+  after_script:
+    - docker rmi -f $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
+
+"5.6":
+  <<: *base
+  variables:
+    PHP_VERSION: "5.6"
+
+"7.0":
+  <<: *base
+  variables:
+    PHP_VERSION: "7.0"
+
+"7.1":
+  <<: *base
+  variables:
+    PHP_VERSION: "7.1"
+
+"7.2":
+  <<: *base
+  variables:
+    PHP_VERSION: "7.2"
+
+"7.3":
+  <<: *base
+  variables:
+    PHP_VERSION: "7.3"
