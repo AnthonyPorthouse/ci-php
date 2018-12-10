@@ -7,6 +7,8 @@ stages:
   stage: build
   variables:
     PHP_VERSION: ""
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p CI_REGISTRY_PASSWORD
   script:
     - docker build --tag $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine ./$PHP_VERSION-alpine
     - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
