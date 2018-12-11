@@ -1,4 +1,4 @@
-FROM php:7.3-rc-alpine
+FROM php:7.3-alpine
 
 LABEL maintainer="Anthony Porthouse<anthony@porthou.se>"
 
