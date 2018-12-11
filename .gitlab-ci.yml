@@ -10,7 +10,7 @@ stages:
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker build --tag $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine ./$PHP_VERSION-alpine
+    - docker build --pull --tag $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine ./$PHP_VERSION-alpine
     - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
   after_script:
     - docker rmi -f $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
