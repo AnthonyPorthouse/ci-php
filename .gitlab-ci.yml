@@ -1,44 +1,112 @@
 image: docker:dind
 
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
 stages:
   - build
+  - push
+  - cleanup
 
 .base: &base
   stage: build
   variables:
     PHP_VERSION: ""
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
     - docker build --pull --tag $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine ./$PHP_VERSION-alpine
     - docker build --pull --tag $CI_REGISTRY_IMAGE:$PHP_VERSION ./$PHP_VERSION
-    - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
-    - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION
-  after_script:
-    - docker rmi -f $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
-    - docker rmi -f $CI_REGISTRY_IMAGE:$PHP_VERSION
 
-"5.6":
+"build:5.6":
   <<: *base
   variables:
     PHP_VERSION: "5.6"
 
-"7.0":
+"build:7.0":
   <<: *base
   variables:
     PHP_VERSION: "7.0"
 
-"7.1":
+"build:7.1":
   <<: *base
   variables:
     PHP_VERSION: "7.1"
 
-"7.2":
+"build:7.2":
   <<: *base
   variables:
     PHP_VERSION: "7.2"
 
-"7.3":
+"build:7.3":
   <<: *base
+  variables:
+    PHP_VERSION: "7.3"
+
+.push: &push
+  stage: push
+  only:
+    refs:
+      - master
+  variables:
+    PHP_VERSION: ""
+  script:
+    - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
+    - docker push $CI_REGISTRY_IMAGE:$PHP_VERSION
+
+"push:5.6":
+  <<: *push
+  variables:
+    PHP_VERSION: "5.6"
+
+"push:7.0":
+  <<: *push
+  variables:
+    PHP_VERSION: "7.0"
+
+"push:7.1":
+  <<: *push
+  variables:
+    PHP_VERSION: "7.1"
+
+"push:7.2":
+  <<: *push
+  variables:
+    PHP_VERSION: "7.2"
+
+"push:7.3":
+  <<: *push
+  variables:
+    PHP_VERSION: "7.3"
+
+.cleanup: &cleanup
+  stage: cleanup
+  when: always
+  variables:
+    PHP_VERSION: ""
+  script:
+    - docker rmi -f $CI_REGISTRY_IMAGE:$PHP_VERSION-alpine
+    - docker rmi -f $CI_REGISTRY_IMAGE:$PHP_VERSION
+
+"cleanup:5.6":
+  <<: *cleanup
+  variables:
+    PHP_VERSION: "5.6"
+
+"cleanup:7.0":
+  <<: *cleanup
+  variables:
+    PHP_VERSION: "7.0"
+
+"cleanup:7.1":
+  <<: *cleanup
+  variables:
+    PHP_VERSION: "7.1"
+
+"cleanup:7.2":
+  <<: *cleanup
+  variables:
+    PHP_VERSION: "7.2"
+
+"cleanup:7.3":
+  <<: *cleanup
   variables:
     PHP_VERSION: "7.3"
